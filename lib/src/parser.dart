@@ -66,33 +66,38 @@ class SvgParser {
         var path = Path();
         writeSvgPathDataToPath(dPath.value, PathModifier(path));
 
-        Color? color;
-        double? strokeWidth;
+        Color? color = Colors.white;
+        double? strokeWidth = 2.0;
 
         //Attributes - [1] css-styling
-        var style = attributes.firstWhereOrNull((attr) => attr.name.local == 'style');
+        var style =
+            attributes.firstWhereOrNull((attr) => attr.name.local == 'style');
         if (style != null) {
           //Parse color of stroke
-          var exp = RegExp(r'stroke:([^;]+);');
-          var match = exp.firstMatch(style.value) as Match;
-          var cStr = match.group(1);
-          color = parseColor(cStr!);
+          var exp = RegExp(r'stroke:([^;]+);?');
+          var match = exp.firstMatch(style.value);
+          if (match != null) {
+            var cStr = match.group(1);
+            color = parseColor(cStr!);
+          }
           //Parse stroke-width
           exp = RegExp(r'stroke-width:([0-9.]+)');
-          match = exp.firstMatch(style.value)!;
-          cStr = match.group(1);
-          strokeWidth = double.tryParse(cStr!);
+          var match2 = exp.firstMatch(style.value);
+          if (match2 != null) {
+            var cStr = match2.group(1);
+            strokeWidth = double.tryParse(cStr!);
+          }
         }
 
-        //Attributes - [2] svg-attributes
-        var strokeElement = attributes.firstWhereOrNull(
-            (attr) => attr.name.local == 'stroke');
+        // Attributes - [2] svg-attributes
+        var strokeElement =
+            attributes.firstWhereOrNull((attr) => attr.name.local == 'stroke');
         if (strokeElement != null) {
           color = parseColor(strokeElement.value);
         }
 
-        var strokeWidthElement = attributes.firstWhereOrNull(
-            (attr) => attr.name.local == 'stroke-width');
+        var strokeWidthElement = attributes
+            .firstWhereOrNull((attr) => attr.name.local == 'stroke-width');
         if (strokeWidthElement != null) {
           strokeWidth = double.tryParse(strokeWidthElement.value);
         }
